@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# license: GPLv2
 import sys
 import urllib
 import urllib2

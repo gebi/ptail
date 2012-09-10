@@ -75,5 +75,7 @@ while True:
             pass
         else:
             raise
-    time.sleep(1)
-
+    try:
+        time.sleep(1)
+    except KeyboardInterrupt, e:
+        sys.exit(0)

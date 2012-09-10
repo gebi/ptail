@@ -1,17 +1,16 @@
 #!/usr/bin/python
 import sys
 import urllib
-from urllib import quote
 import urllib2
 import time
 
 
 def die(Msg):
-    sys.stderr.write(Msg + "\n")
+    sys.stderr.write("Error: " + Msg + "\n")
     sys.exit(1)
 
 def warn(Msg):
-    sys.stderr.write(Msg + "\n")
+    sys.stderr.write("Warn: " + Msg + "\n")
 
 
 if len(sys.argv) < 2:
@@ -27,16 +26,20 @@ def get_file_size(url):
     req.get_method = lambda : 'HEAD'
     res = urllib2.urlopen(req)
     if res.headers.has_key('Accept-Ranges') == False:
-        warn("No Accept-Range header from server, no explicit support, trying anyway")
+        warn("No Accept-Range header from server, means no explicit support, trying anyway")
     elif res.headers.getheader('Accept-Ranges') == 'none':
         die("Server does not support Accept-Ranges")
     server_values = res.headers.values()
-    return int(server_values[0])
+    try:
+        file_size = int(server_values[0])
+    except ValueError, e:
+        die("Server did not return filesize: \"%s\"" %(server_values[0]))
+    return file_size
 
 def parse_content_range(content_range):
     [range_type, raw_range] = content_range.split(' ', 1)
     if range_type != 'bytes':
-        die("parse_content_range: unsupported range type: %s" %(quote(range_type)))
+        die("parse_content_range: unsupported range type: \"%s\"" %(range_type))
     [start, rest] = raw_range.split('-', 1)
     [stop, size] = rest.split('/', 1)
     # attention: size could be '*' if size is unknown on server side

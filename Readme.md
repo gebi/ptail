@@ -1,12 +1,12 @@
-# ptail - Python based tail (initially for tail-f over http)
+# ptail - Tail-f through http (python based)
+
+The intended usecase of ptail is to get easy access to remote logfiles
+over http without the need to install additional software on the server.
 
 ptail is a simple tail that works over http (initially).
 ptail uses an initial HEAD request to get the size of the file requested,
 and then uses range requests to get only new content.
 It's thus a complete client side solution.
-
-It's intended usecase is to get easy access to remote logfiles
-over http without the need to install additional software on the server.
 
 The same method currently used with http can also be used with other protocols.
 

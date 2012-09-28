@@ -4,20 +4,19 @@ import sys
 import urllib
 import urllib2
 import time
+import optparse
 
 
-def die(Msg):
+def die(Msg, parser=None):
     sys.stderr.write("Error: " + Msg + "\n")
+    if parser:
+        parser.print_help()
     sys.exit(1)
 
 def warn(Msg):
     sys.stderr.write("Warn: " + Msg + "\n")
 
 
-if len(sys.argv) < 2:
-    die("ptail <url to get>")
-
-url = sys.argv[1]
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = { 'User-Agent' : user_agent }
 pointer = 0
@@ -52,9 +51,17 @@ def get_file_data_from(url, offset):
     res = urllib2.urlopen(req)
     return res
 
+usage = "usage: %prog [options] URL"
+parser = optparse.OptionParser(usage, conflict_handler="resolve")
+parser.add_option("-n", dest="num_lines", default=1, help="Number of kilobytes to show at begin")
+(opts, args) = parser.parse_args()
+if len(args) < 1:
+    die("no URL given", parser)
+
+url = args[0]
 file_size = get_file_size(url)
 sys.stderr.write('Filesize = %d\n' %(file_size))
-pointer = file_size - (1*1024)
+pointer = file_size - (int(opts.num_lines)*1024)
 first_get = False
 if pointer < 0:
     pointer = 0
@@ -76,6 +83,8 @@ while True:
             pass
         else:
             raise
+    except KeyboardInterrupt, e:
+        sys.exit(0);
     try:
         time.sleep(1)
     except KeyboardInterrupt, e:
